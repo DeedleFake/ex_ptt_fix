@@ -41,7 +41,7 @@ defmodule ExPttFix.Devices do
           end
       end
 
-    Process.send_after(self(), :scan_devices_tick, :timer.minutes(5))
+    Process.send_after(self(), :scan_devices_tick, :timer.seconds(30))
     {:noreply, state}
   end
 
