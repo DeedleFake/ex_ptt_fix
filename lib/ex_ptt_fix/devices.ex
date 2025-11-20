@@ -31,7 +31,7 @@ defmodule ExPttFix.Devices do
       for {path, %{name: name}} when not is_map_key(state.device_processes, path) <- devices,
           reduce: state do
         state ->
-          Logger.debug("found device: #{path} (#{name})")
+          Logger.info("found new device: #{path} (#{name})")
 
           start_device_process(path)
           |> case do
@@ -116,7 +116,7 @@ defmodule ExPttFix.Devices do
     {pid, state} = pop_in(state.device_processes[path])
 
     if pid do
-      Logger.debug("device removed: #{path}")
+      Logger.info("device removed: #{path}")
     end
 
     update_pressed(state, config_key(), config_press(), path, false)
