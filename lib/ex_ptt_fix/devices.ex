@@ -12,7 +12,7 @@ defmodule ExPttFix.Devices do
 
   @impl true
   def init([]) do
-    state = %{device_processes: %{}, pressed: 0}
+    state = %{device_processes: %{}, pressed: MapSet.new()}
     {:ok, state, {:continue, :scan_devices}}
   end
 
@@ -46,6 +46,12 @@ defmodule ExPttFix.Devices do
   end
 
   @impl true
+  def handle_info(:test, state) do
+    InputEvent.stop(state.device_processes["/dev/input/event2"])
+    {:noreply, state}
+  end
+
+  @impl true
   def handle_info(:scan_devices_tick, state) do
     {:noreply, state, {:continue, :scan_devices}}
   end
@@ -60,18 +66,7 @@ defmodule ExPttFix.Devices do
           key_state in [0, 1],
           key == config_key,
           reduce: state do
-        state ->
-          pressed = key_state != 0
-          Logger.debug("#{config_key} pressed: #{pressed} (#{path})")
-
-          state =
-            update_in(state.pressed, fn
-              pressed when key_state == 0 -> pressed - 1
-              pressed when key_state == 1 -> pressed + 1
-            end)
-
-          Xdo.keypress(state.pressed != 0, config_press)
-          state
+        state -> update_pressed(state, config_key, config_press, path, key_state != 0)
       end
 
     {:noreply, state}
@@ -79,9 +74,17 @@ defmodule ExPttFix.Devices do
 
   @impl true
   def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do
-    # TODO: Unpress key of removed device if pressed.
-    state = update_in(state.device_processes, &remove_device_process(&1, pid))
-    {:noreply, state}
+    state.device_processes
+    |> Enum.find(&match?({_, ^pid}, &1))
+    |> case do
+      {path, ^pid} ->
+        {_, state} = pop_in(state.device_processes[path])
+        state = update_pressed(state, config_key(), config_press(), path, false)
+        {:noreply, state}
+
+      nil ->
+        {:noreply, state}
+    end
   end
 
   defp start_device_process(path) do
@@ -94,8 +97,23 @@ defmodule ExPttFix.Devices do
     DynamicSupervisor.start_child(ExPttFix.DeviceSupervisor, spec)
   end
 
-  defp remove_device_process(device_processes, target_pid) do
-    for {path, pid} <- device_processes, pid != target_pid, into: %{}, do: {path, pid}
+  defp update_pressed(state, config_key, config_press, path, key_state) do
+    pressed =
+      if key_state do
+        MapSet.put(state.pressed, path)
+      else
+        MapSet.delete(state.pressed, path)
+      end
+
+    if pressed != state.pressed do
+      pressed? = MapSet.size(pressed) != 0
+      Logger.debug("#{config_key} pressed: #{pressed?} (#{path})")
+
+      Xdo.keypress(pressed?, config_press)
+      %{state | pressed: pressed}
+    else
+      state
+    end
   end
 
   defp config_key() do
