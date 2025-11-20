@@ -57,7 +57,7 @@ defmodule ExPttFix.Devices do
   end
 
   @impl true
-  def handle_info({:input_event, path, events}, state) do
+  def handle_info({:input_event, path, events}, state) when is_list(events) do
     config_key = config_key()
     config_press = config_press()
 
@@ -73,13 +73,18 @@ defmodule ExPttFix.Devices do
   end
 
   @impl true
+  def handle_info({:input_event, path, :disconnect}, state) do
+    state = remove_device(state, path)
+    {:noreply, state}
+  end
+
+  @impl true
   def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do
     state.device_processes
     |> Enum.find(&match?({_, ^pid}, &1))
     |> case do
       {path, ^pid} ->
-        {_, state} = pop_in(state.device_processes[path])
-        state = update_pressed(state, config_key(), config_press(), path, false)
+        state = remove_device(state, path)
         {:noreply, state}
 
       nil ->
@@ -94,7 +99,20 @@ defmodule ExPttFix.Devices do
         restart: :transient
       )
 
-    DynamicSupervisor.start_child(ExPttFix.DeviceSupervisor, spec)
+    DynamicSupervisor.start_child(
+      ExPttFix.DeviceSupervisor,
+      {ExPttFix.Isolate, children: [spec], strategy: :one_for_one}
+    )
+  end
+
+  defp remove_device(state, path) do
+    {pid, state} = pop_in(state.device_processes[path])
+
+    if pid do
+      Logger.debug("device removed: #{path}")
+    end
+
+    update_pressed(state, config_key(), config_press(), path, false)
   end
 
   defp update_pressed(state, config_key, config_press, path, key_state) do
