@@ -1,21 +1,4 @@
-# ExPttFix
+ex_ptt_fix
+==========
 
-**TODO: Add description**
-
-## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `ex_ptt_fix` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:ex_ptt_fix, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/ex_ptt_fix>.
-
+An experimental rewrite of [ptt-fix](https://github.com/DeedleFake/ptt-fix) using Elixir. This is not intended for actual use. ptt-fix works just fine and an Elixir version has a lot of issues, such as more potentially complicated permission problems and higher memory usage for no real gain. It's just for fun.
