@@ -49,8 +49,12 @@ defmodule ExPttFix.Devices do
 
   @impl true
   def handle_info({:input_event, path, events}, state) do
-    for {:ev_key, :key_comma, key_state} <- events, key_state in [0, 1] do
-      Logger.debug("comma pressed: #{key_state != 0} (#{path})")
+    config_key = "key_#{config_key()}"
+
+    for {:ev_key, key, key_state} <- events,
+        key_state in [0, 1],
+        Atom.to_string(key) == config_key do
+      Logger.debug("#{config_key} pressed: #{key_state != 0} (#{path})")
     end
 
     {:noreply, state}
@@ -74,5 +78,9 @@ defmodule ExPttFix.Devices do
 
   defp remove_device_process(device_processes, target_pid) do
     for {path, pid} <- device_processes, pid != target_pid, into: %{}, do: {path, pid}
+  end
+
+  defp config_key() do
+    Application.fetch_env!(:ex_ptt_fix, :key)
   end
 end
