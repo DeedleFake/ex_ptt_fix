@@ -12,7 +12,7 @@ defmodule ExPttFix.Devices do
 
   @impl true
   def init([]) do
-    state = %{device_processes: %{}}
+    state = %{device_processes: %{}, pressed: 0}
     {:ok, state, {:continue, :scan_devices}}
   end
 
@@ -20,25 +20,26 @@ defmodule ExPttFix.Devices do
   def handle_continue(:scan_devices, state) do
     devices = InputEvent.enumerate()
 
-    for {path, %{name: name}} when not is_map_key(state.device_processes, path) <- devices,
-        reduce: state do
-      state ->
-        Logger.debug("found device: #{path} (#{name})")
+    state =
+      for {path, %{name: name}} when not is_map_key(state.device_processes, path) <- devices,
+          reduce: state do
+        state ->
+          Logger.debug("found device: #{path} (#{name})")
 
-        start_device_process(path)
-        |> case do
-          {:ok, pid} ->
-            Process.monitor(pid)
-            put_in(state.device_processes[path], pid)
+          start_device_process(path)
+          |> case do
+            {:ok, pid} ->
+              Process.monitor(pid)
+              put_in(state.device_processes[path], pid)
 
-          {:error, err} ->
-            Logger.warning(
-              "failed to start device monitor for #{path}: #{Exception.format(:error, err)}"
-            )
+            {:error, err} ->
+              Logger.warning(
+                "failed to start device monitor for #{path}: #{Exception.format(:error, err)}"
+              )
 
-            state
-        end
-    end
+              state
+          end
+      end
 
     Process.send_after(self(), :scan_devices_tick, :timer.minutes(5))
     {:noreply, state}
@@ -54,13 +55,24 @@ defmodule ExPttFix.Devices do
     config_key = config_key()
     config_press = config_press()
 
-    for {:ev_key, key, key_state} <- events,
-        key_state in [0, 1],
-        key == config_key do
-      pressed = key_state != 0
-      Logger.debug("#{config_key} pressed: #{pressed} (#{path})")
-      Xdo.keypress(pressed, config_press)
-    end
+    state =
+      for {:ev_key, key, key_state} <- events,
+          key_state in [0, 1],
+          key == config_key,
+          reduce: state do
+        state ->
+          pressed = key_state != 0
+          Logger.debug("#{config_key} pressed: #{pressed} (#{path})")
+
+          state =
+            update_in(state.pressed, fn
+              pressed when key_state == 0 -> pressed - 1
+              pressed when key_state == 1 -> pressed + 1
+            end)
+
+          Xdo.keypress(state.pressed != 0, config_press)
+          state
+      end
 
     {:noreply, state}
   end
