@@ -1,0 +1,4 @@
+%{
+  "elixir_make": {:hex, :elixir_make, "0.9.0", "6484b3cd8c0cee58f09f05ecaf1a140a8c97670671a6a0e7ab4dc326c3109726", [:mix], [], "hexpm", "db23d4fd8b757462ad02f8aa73431a426fe6671c80b200d9710caf3d1dd0ffdb"},
+  "input_event": {:hex, :input_event, "1.4.2", "8ad280387595110cf4ac4d92cfcfd2f5d61f7285084f35adc5feec077df23058", [:make, :mix], [{:elixir_make, "~> 0.6", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm", "eb12e3a5d83f2c570d965ad0a5de7bea7c9f387b425ae882c00f3a2a00971e3f"},
+}
