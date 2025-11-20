@@ -1,4 +1,11 @@
 defmodule ExPttFix.Devices do
+  @moduledoc """
+  This GenServer monitors for new devices being connected and starts
+  new processes to monitor each when it finds one. It waits for the
+  expected key to be pressed on each and sends the appropriate key to
+  the X server when the expected keys are pressed.
+  """
+
   use GenServer
   require Logger
 

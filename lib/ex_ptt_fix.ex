@@ -1,4 +1,8 @@
 defmodule ExPttFix do
+  @moduledoc """
+  This is the main supervisor of the system.
+  """
+
   use Supervisor
 
   def start_link([]) do

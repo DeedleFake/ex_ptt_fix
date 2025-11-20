@@ -1,4 +1,9 @@
 defmodule ExPttFix.Xdo do
+  @moduledoc """
+  This module provides functions to send key events to the X server
+  using xdo.
+  """
+
   def keypress(true, key) when is_binary(key), do: keydown(key)
   def keypress(false, key) when is_binary(key), do: keyup(key)
 
