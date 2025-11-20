@@ -4,15 +4,18 @@ defmodule ExPttFix.Xdo do
   using xdo.
   """
 
+  @spec keypress(down :: boolean(), key :: String.t()) :: :ok
   def keypress(true, key) when is_binary(key), do: keydown(key)
   def keypress(false, key) when is_binary(key), do: keyup(key)
 
-  def keydown(name) when is_binary(name) do
-    xdotool(["keydown", name])
+  @spec keydown(String.t()) :: :ok
+  def keydown(key) when is_binary(key) do
+    xdotool(["keydown", key])
   end
 
-  def keyup(name) when is_binary(name) do
-    xdotool(["keyup", name])
+  @spec keyup(String.t()) :: :ok
+  def keyup(key) when is_binary(key) do
+    xdotool(["keyup", key])
   end
 
   defp xdotool(args) when is_list(args) do
