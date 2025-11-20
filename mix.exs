@@ -7,7 +7,8 @@ defmodule ExPttFix.MixProject do
       version: "0.1.0",
       elixir: "~> 1.19",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      escript: escript()
     ]
   end
 
@@ -16,6 +17,13 @@ defmodule ExPttFix.MixProject do
     [
       extra_applications: [:logger],
       mod: {ExPttFix.Application, []}
+    ]
+  end
+
+  defp escript do
+    [
+      main_module: ExPttFix.CLI,
+      include_priv_for: [:input_event]
     ]
   end
 
