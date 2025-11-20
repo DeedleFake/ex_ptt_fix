@@ -2,6 +2,8 @@ defmodule ExPttFix.Devices do
   use GenServer
   require Logger
 
+  alias ExPttFix.Xdo
+
   @name __MODULE__
 
   def start_link([]) do
@@ -49,12 +51,15 @@ defmodule ExPttFix.Devices do
 
   @impl true
   def handle_info({:input_event, path, events}, state) do
-    config_key = "key_#{config_key()}"
+    config_key = config_key()
+    config_press = config_press()
 
     for {:ev_key, key, key_state} <- events,
         key_state in [0, 1],
-        Atom.to_string(key) == config_key do
-      Logger.debug("#{config_key} pressed: #{key_state != 0} (#{path})")
+        key == config_key do
+      pressed = key_state != 0
+      Logger.debug("#{config_key} pressed: #{pressed} (#{path})")
+      Xdo.keypress(pressed, config_press)
     end
 
     {:noreply, state}
@@ -62,6 +67,7 @@ defmodule ExPttFix.Devices do
 
   @impl true
   def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do
+    # TODO: Unpress key of removed device if pressed.
     state = update_in(state.device_processes, &remove_device_process(&1, pid))
     {:noreply, state}
   end
@@ -82,5 +88,10 @@ defmodule ExPttFix.Devices do
 
   defp config_key() do
     Application.fetch_env!(:ex_ptt_fix, :key)
+    |> String.to_existing_atom()
+  end
+
+  defp config_press() do
+    Application.fetch_env!(:ex_ptt_fix, :press)
   end
 end
