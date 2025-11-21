@@ -19,6 +19,7 @@ defmodule ExPttFix.Devices do
 
   @impl true
   def init([]) do
+    FSNotify.subscribe(ExPttFix.FSNotify)
     state = %{device_processes: %{}, pressed: MapSet.new()}
     {:ok, state, {:continue, :scan_devices}}
   end

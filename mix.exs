@@ -23,7 +23,7 @@ defmodule ExPttFix.MixProject do
   defp deps do
     [
       {:input_event, "~> 1.4"},
-      {:fsnotify, "~> 0.1.1"}
+      {:fsnotify, "~> 0.2.0"}
     ]
   end
 end

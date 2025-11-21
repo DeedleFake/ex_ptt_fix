@@ -13,8 +13,8 @@ defmodule ExPttFix do
   def init([]) do
     children = [
       {DynamicSupervisor, name: ExPttFix.DeviceSupervisor},
-      ExPttFix.Devices,
-      {FSNotify, name: ExPttFix.FSNNotify, receiver: ExPttFix.Devices, watches: ["/dev/input"]}
+      {FSNotify, name: ExPttFix.FSNotify, watches: ["/dev/input"]},
+      ExPttFix.Devices
     ]
 
     Supervisor.init(children, strategy: :one_for_all)
