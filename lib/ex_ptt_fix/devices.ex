@@ -48,7 +48,6 @@ defmodule ExPttFix.Devices do
           end
       end
 
-    Process.send_after(self(), :scan_devices_tick, :timer.seconds(30))
     {:noreply, state}
   end
 
@@ -59,8 +58,12 @@ defmodule ExPttFix.Devices do
   end
 
   @impl true
-  def handle_info(:scan_devices_tick, state) do
-    {:noreply, state, {:continue, :scan_devices}}
+  def handle_info({:fsnotify_event, _path, op}, state) do
+    if :create in op do
+      {:noreply, state, {:continue, :scan_devices}}
+    else
+      {:noreply, state}
+    end
   end
 
   @impl true

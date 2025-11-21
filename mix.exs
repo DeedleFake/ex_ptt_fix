@@ -22,7 +22,8 @@ defmodule ExPttFix.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:input_event, "~> 1.4"}
+      {:input_event, "~> 1.4"},
+      {:fsnotify, "~> 0.1.1"}
     ]
   end
 end
