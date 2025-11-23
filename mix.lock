@@ -1,5 +1,5 @@
 %{
   "elixir_make": {:hex, :elixir_make, "0.9.0", "6484b3cd8c0cee58f09f05ecaf1a140a8c97670671a6a0e7ab4dc326c3109726", [:mix], [], "hexpm", "db23d4fd8b757462ad02f8aa73431a426fe6671c80b200d9710caf3d1dd0ffdb"},
-  "fsnotify": {:hex, :fsnotify, "0.2.0", "f012a388994990ba7c3f4bdbd13ace9c4a79ca66bb0d96e8e05a2ef8839e49de", [:mix], [], "hexpm", "59b9c6750444b3281c6419d35f48861edc9b93185f2066a2d60fe5919d758b5a"},
+  "fsnotify": {:hex, :fsnotify, "0.2.1", "6f99d7362b777fb1b6c7bc1a0fe2cbd5cfc4d3205069fcae9de7f10a1d7001c0", [:mix], [], "hexpm", "b1ddd4a5e1127b95d6cab490864add158a31c8d70d04c8abb15d2a386a7234b3"},
   "input_event": {:hex, :input_event, "1.4.2", "8ad280387595110cf4ac4d92cfcfd2f5d61f7285084f35adc5feec077df23058", [:make, :mix], [{:elixir_make, "~> 0.6", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm", "eb12e3a5d83f2c570d965ad0a5de7bea7c9f387b425ae882c00f3a2a00971e3f"},
 }
